@@ -1212,7 +1212,7 @@ async function buildAndDeliver(f){
   try{ blob=await generatePDF(f); }
   catch(err){ console.error(err); toast('Erreur lors de la génération'); return; }
   const safe=(f.numero||'fiche').replace(/[^\w\-]+/g,'_').replace(/^_+|_+$/g,'')||'fiche';
-  presentPdf(blob,`Controle_${safe}_${f.date||todayISO()}.pdf`);
+  presentPdf(blob,`${safe}.pdf`);
 }
 
 function sane(t){return (t||'').replace(/[\u2013\u2014]/g,'-').replace(/[\u2018\u2019]/g,"'").replace(/\u2026/g,'...').replace(/[\u201C\u201D]/g,'"');}
