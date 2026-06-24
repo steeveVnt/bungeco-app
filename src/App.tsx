@@ -467,7 +467,7 @@ export default function App() {
       </header>
 
       {appMode === "vente" && (
-        <iframe src="/vente/index.html" className="flex-1 w-full border-none" title="BUNG'ECO Vente" />
+        <iframe src={`${import.meta.env.BASE_URL}vente/index.html`} className="flex-1 w-full border-none" title="BUNG'ECO Vente" />
       )}
 
       {appMode === "location" && <>
