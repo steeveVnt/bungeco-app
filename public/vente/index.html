@@ -437,7 +437,7 @@ async function getTemplate(){
   }
   return m.data;
 }
-async function saveTemplate(t){ await idbPut('meta',{key:'template',data:t}); }
+async function saveTemplate(t){ await idbPut('meta',{key:'template',data:t,version:TPL_VERSION}); }
 
 /* ---------- App state ---------- */
 let STATE={ view:'list', fiche:null, template:null };
@@ -500,7 +500,11 @@ function autosave(){
 async function renderList(){
   STATE.view='list'; STATE.fiche=null;
   const fiches=(await idbAll('fiches')).sort((a,b)=>b.updatedAt-a.updatedAt);
-  let html=`<div class="eyebrow">États des lieux</div><h1 class="page-title">Mes fiches de contrôle</h1>`;
+  let html=`<div class="eyebrow">États des lieux</div>
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+    <h1 class="page-title" style="margin:0;flex:1">Mes fiches de contrôle</h1>
+    <button class="icon-btn" id="btnGearTpl" title="Gérer la check-list" style="width:40px;height:40px;font-size:18px">⚙︎</button>
+  </div>`;
 
   if(fiches.length===0){
     html+=`<div class="card"><div class="empty">
@@ -533,6 +537,7 @@ async function renderList(){
   app.innerHTML=html;
 
   document.getElementById('btnNew').onclick=newFiche;
+  document.getElementById('btnGearTpl').onclick=()=>renderTemplate();
   app.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>openFiche(b.dataset.open));
   app.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>delFiche(b.dataset.del));
   app.querySelectorAll('[data-dup]').forEach(b=>b.onclick=()=>dupFiche(b.dataset.dup));
