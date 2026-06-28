@@ -456,6 +456,7 @@ function ficheFromTemplate(tpl){
   return {
     id:uid(),
     numero:'',
+    poids:'',
     date:todayISO(),
     technicien:'',
     notes:'',
@@ -591,6 +592,10 @@ function renderFiche(focusNum){
         <input id="f-numero" placeholder="ex. BE-2026-0142" value="${escapeAttr(f.numero)}">
       </div>
       <div class="field" style="max-width:160px">
+        <label>Poids (kg)</label>
+        <input id="f-poids" type="number" placeholder="ex. 2500" value="${escapeAttr(f.poids||'')}">
+      </div>
+      <div class="field" style="max-width:160px">
         <label>Date</label>
         <input id="f-date" type="date" value="${escapeAttr(f.date)}">
       </div>
@@ -709,6 +714,7 @@ function bindFiche(){
 
   // header fields
   document.getElementById('f-numero').oninput=e=>{f.numero=e.target.value;autosave();};
+  document.getElementById('f-poids').oninput=e=>{f.poids=e.target.value;autosave();};
   document.getElementById('f-date').oninput=e=>{f.date=e.target.value;autosave();};
   document.getElementById('f-tech').oninput=e=>{f.technicien=e.target.value;autosave();};
   document.getElementById('f-notes').oninput=e=>{f.notes=e.target.value;autosave();};
@@ -1245,9 +1251,10 @@ async function generatePDF(f){
   // ---- Bloc infos ----
   const col2=M+CW/2;
   doc.setFont('helvetica','bold');doc.setTextColor(...C.soft);doc.setFontSize(8);
-  doc.text('N° DE MODULE',M,y); doc.text('DATE',col2,y);
+  const col3=M+CW*2/3;
+  doc.text('N° DE MODULE',M,y); doc.text('POIDS (KG)',col2,y); doc.text('DATE',col3,y);
   doc.setTextColor(...C.ink);doc.setFontSize(12);
-  doc.text(sane(f.numero)||'—',M,y+5.5); doc.text(frDate(f.date),col2,y+5.5);
+  doc.text(sane(f.numero)||'—',M,y+5.5); doc.text(sane(f.poids)||'—',col2,y+5.5); doc.text(frDate(f.date),col3,y+5.5);
   y+=11;
   doc.setFont('helvetica','bold');doc.setTextColor(...C.soft);doc.setFontSize(8);
   doc.text('CONTRÔLEUR',M,y);
