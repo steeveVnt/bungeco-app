@@ -79,7 +79,7 @@ const SEED_INSPECTIONS: HistoryRecord[] = [
 ];
 
 export default function App() {
-  const [appMode, setAppMode] = useState<"location" | "vente">("location");
+  const [appMode, setAppMode] = useState<"location" | "vente">("vente");
   const [inspections, setInspections] = useState<HistoryRecord[]>([]);
   const [activeTab, setActiveTab] = useState<"history" | "new_edl" | "delivery_check">("history");
   const [editingInspection, setEditingInspection] = useState<Inspection | null>(null);
