@@ -1350,21 +1350,17 @@ async function generatePDF(f){
     doc.setFillColor(...C.brand);doc.rect(M,y,CW,7,'F');
     doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');doc.setFontSize(9.5);
     doc.text('PHOTOS',M+3,y+4.8);y+=10;
-    const cols=2, gap=4, cellW=(CW-gap*(cols-1))/cols, maxH=90;
-    let col=0, rowTop=y, rowMaxH=0;
     for(const ph of f.photos){
       let img; try{img=await loadImg(ph.data);}catch(e){continue;}
       const ar=img.width/img.height;
-      let w=cellW, h=w/ar; if(h>maxH){h=maxH;w=h*ar;}
-      if(col===0){ ensure(h+gap); rowTop=y; }
-      const x=M+col*(cellW+gap)+(cellW-w)/2;
-      try{doc.addImage(ph.data,'JPEG',x,rowTop,w,h);}catch(e){}
-      doc.setDrawColor(...C.line);doc.setLineWidth(0.3);doc.rect(x,rowTop,w,h);
-      rowMaxH=Math.max(rowMaxH,h);
-      col++;
-      if(col===cols){ y=rowTop+rowMaxH+gap; col=0; rowMaxH=0; }
+      let w=CW, h=w/ar; const maxH=PH-2*M-14;
+      if(h>maxH){h=maxH;w=h*ar; if(w>CW){w=CW;h=w/ar;}}
+      ensure(h+4);
+      const x=M+(CW-w)/2;
+      try{doc.addImage(ph.data,'JPEG',x,y,w,h);}catch(e){}
+      doc.setDrawColor(...C.line);doc.setLineWidth(0.3);doc.rect(x,y,w,h);
+      y+=h+4;
     }
-    if(col!==0){ y=rowTop+rowMaxH+gap; }
   }
 
   // ---- documents scannés ----
