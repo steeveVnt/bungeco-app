@@ -238,9 +238,16 @@ h1.page-title{font-size:22px;margin:2px 0 16px;letter-spacing:-.3px}
 .tpl-section-head{display:flex;align-items:center;gap:8px;margin-bottom:6px}
 .tpl-section-head input{flex:1;font-weight:800;text-transform:uppercase;letter-spacing:.8px;font-size:13px;
   border:1px solid var(--line);border-radius:9px;padding:10px 12px;background:var(--brand);color:#fff}
-.tpl-item{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--surface-2)}
-.tpl-item input.lbl{flex:1;border:1px solid var(--line);border-radius:8px;padding:9px 10px;background:var(--surface)}
+.tpl-item{display:flex;align-items:center;gap:6px;padding:8px 0;border-bottom:1px solid var(--surface-2);flex-wrap:wrap}
+.tpl-item input.lbl{flex:1;border:1px solid var(--line);border-radius:8px;padding:9px 10px;background:var(--surface);min-width:120px}
 .tpl-item select{border:1px solid var(--line);border-radius:8px;padding:9px 8px;background:var(--surface);font-size:13px}
+.tpl-move{display:flex;gap:2px;flex:none}
+.tpl-move button{width:30px;height:30px;border-radius:7px;border:1px solid var(--line);background:var(--surface-2);
+  display:flex;align-items:center;justify-content:center;color:var(--ink-soft);font-size:13px;padding:0}
+.tpl-move button:active{background:var(--line)}
+.tpl-move button:disabled{opacity:.3;cursor:default}
+.tpl-move select{border:1px solid var(--line);border-radius:7px;padding:4px 2px;background:var(--surface-2);
+  font-size:11px;color:var(--ink-soft);max-width:90px}
 .add-line{display:flex;gap:8px;margin-top:10px}
 .add-line input{flex:1;border:1px solid var(--line-strong);border-radius:9px;padding:11px;background:var(--surface-2)}
 .add-line select{border:1px solid var(--line-strong);border-radius:9px;padding:11px 8px;background:var(--surface-2)}
@@ -866,7 +873,16 @@ async function renderTemplate(){
         <button class="icon-btn danger" data-delsec="${si}" title="Supprimer la section">🗑</button>
       </div>`;
     s.items.forEach((it,ii)=>{
+      const moveOpts=tpl.sections.filter((_,i)=>i!==si).map((sec,i)=>{
+        const ri=i>=si?i+1:i;
+        return `<option value="${ri}">${escapeHtml(sec.title)}</option>`;
+      }).join('');
       html+=`<div class="tpl-item">
+        <div class="tpl-move">
+          <button data-up="${si}|${ii}" title="Monter" ${ii===0?'disabled':''}>▲</button>
+          <button data-down="${si}|${ii}" title="Descendre" ${ii===s.items.length-1?'disabled':''}>▼</button>
+          ${tpl.sections.length>1?`<select data-moveto="${si}|${ii}" title="Déplacer vers…"><option value="">→</option>${moveOpts}</select>`:''}
+        </div>
         <input class="lbl" data-il="${si}|${ii}" value="${escapeAttr(it.label)}">
         <select data-it="${si}|${ii}">
           <option value="check" ${it.type==='check'?'selected':''}>Coche</option>
@@ -906,6 +922,23 @@ function bindTemplate(){
     if(sel.value==='check'){it.type='check';delete it.kind;}
     else{it.type='value';it.kind=sel.value==='value-number'?'number':'text';}
     save();
+  });
+  app.querySelectorAll('[data-up]').forEach(b=>b.onclick=async()=>{
+    const[si,ii]=b.dataset.up.split('|').map(Number);if(ii===0)return;
+    const items=tpl.sections[si].items;[items[ii-1],items[ii]]=[items[ii],items[ii-1]];
+    await save();renderTemplate();
+  });
+  app.querySelectorAll('[data-down]').forEach(b=>b.onclick=async()=>{
+    const[si,ii]=b.dataset.down.split('|').map(Number);const items=tpl.sections[si].items;
+    if(ii>=items.length-1)return;[items[ii],items[ii+1]]=[items[ii+1],items[ii]];
+    await save();renderTemplate();
+  });
+  app.querySelectorAll('[data-moveto]').forEach(sel=>sel.onchange=async()=>{
+    const[si,ii]=sel.dataset.moveto.split('|').map(Number);const ti=+sel.value;
+    if(isNaN(ti))return;
+    const item=tpl.sections[si].items.splice(ii,1)[0];
+    tpl.sections[ti].items.push(item);
+    await save();renderTemplate();toast('Point déplacé');
   });
   app.querySelectorAll('[data-deli]').forEach(b=>b.onclick=async()=>{const[si,ii]=b.dataset.deli.split('|').map(Number);tpl.sections[si].items.splice(ii,1);await save();renderTemplate();});
   app.querySelectorAll('[data-delsec]').forEach(b=>b.onclick=async()=>{const ok=await confirmDialog('Supprimer cette section et tous ses points ?',{okLabel:'Supprimer'});if(!ok)return;tpl.sections.splice(+b.dataset.delsec,1);await save();renderTemplate();});
