@@ -907,18 +907,18 @@ function bindTemplate(){
     else{it.type='value';it.kind=sel.value==='value-number'?'number':'text';}
     save();
   });
-  app.querySelectorAll('[data-deli]').forEach(b=>b.onclick=()=>{const[si,ii]=b.dataset.deli.split('|').map(Number);tpl.sections[si].items.splice(ii,1);save();renderTemplate();});
-  app.querySelectorAll('[data-delsec]').forEach(b=>b.onclick=async()=>{const ok=await confirmDialog('Supprimer cette section et tous ses points ?',{okLabel:'Supprimer'});if(!ok)return;tpl.sections.splice(+b.dataset.delsec,1);save();renderTemplate();});
-  app.querySelectorAll('[data-additem]').forEach(b=>b.onclick=()=>{
+  app.querySelectorAll('[data-deli]').forEach(b=>b.onclick=async()=>{const[si,ii]=b.dataset.deli.split('|').map(Number);tpl.sections[si].items.splice(ii,1);await save();renderTemplate();});
+  app.querySelectorAll('[data-delsec]').forEach(b=>b.onclick=async()=>{const ok=await confirmDialog('Supprimer cette section et tous ses points ?',{okLabel:'Supprimer'});if(!ok)return;tpl.sections.splice(+b.dataset.delsec,1);await save();renderTemplate();});
+  app.querySelectorAll('[data-additem]').forEach(b=>b.onclick=async()=>{
     const si=+b.dataset.additem;
     const lbl=app.querySelector(`[data-newlbl="${si}"]`).value.trim();
     if(!lbl){toast('Saisissez un libellé');return;}
     const t=app.querySelector(`[data-newtype="${si}"]`).value;
     const it={id:uid(),label:lbl,type:t==='check'?'check':'value'};
     if(t==='value-number')it.kind='number'; else if(t==='value-text')it.kind='text';
-    tpl.sections[si].items.push(it);save();renderTemplate();
+    tpl.sections[si].items.push(it);await save();renderTemplate();
   });
-  document.getElementById('addSection').onclick=()=>{tpl.sections.push({id:uid(),title:'Nouvelle section',items:[]});save();renderTemplate();};
+  document.getElementById('addSection').onclick=async()=>{tpl.sections.push({id:uid(),title:'Nouvelle section',items:[]});await save();renderTemplate();};
   document.getElementById('tplDone').onclick=renderList;
   document.getElementById('resetTpl').onclick=async()=>{
     const ok=await confirmDialog("Restaurer la check-list d'origine ?\n\nVos modifications du modèle seront perdues. Les fiches déjà créées restent intactes.",{okLabel:'Réinitialiser'});
