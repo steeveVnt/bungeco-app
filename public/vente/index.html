@@ -188,6 +188,8 @@ h1.page-title{font-size:22px;margin:2px 0 16px;letter-spacing:-.3px}
 .photo-add:active{background:var(--amber-soft);border-color:var(--amber)}
 .photo-add.scan{border-color:var(--brand);color:var(--brand)}
 .photo-add.scan:active{background:#e8eef4}
+.photo-add.gallery{border-color:#4caf50;color:#4caf50}
+.photo-add.gallery:active{background:#e8f5e9}
 
 /* ---------- DOCUMENTS ---------- */
 .doc-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:14px 16px}
@@ -325,6 +327,7 @@ h1.page-title{font-size:22px;margin:2px 0 16px;letter-spacing:-.3px}
 
 <!-- hidden file input for photos -->
 <input type="file" id="photoInput" accept="image/*" capture="environment" multiple style="display:none">
+<input type="file" id="galleryInput" accept="image/*" multiple style="display:none">
 
 
 <script>
@@ -668,6 +671,7 @@ function renderFiche(focusNum){
       <div class="photo-section-title print-only">Photos</div>
       <div class="photo-grid" id="photo-grid">${renderPhotos(f)}
         <button class="photo-add no-print" id="addPhoto"><span class="plus">＋</span>Photo</button>
+        <button class="photo-add gallery no-print" id="addGallery"><span class="plus">🖼</span>Galerie</button>
         <button class="photo-add scan no-print" id="scanDoc"><span class="plus">⛶</span>Scanner doc</button>
       </div>
     </div>
@@ -768,6 +772,12 @@ function bindFiche(){
   // photos
   document.getElementById('addPhoto').onclick=()=>{
     const input=document.getElementById('photoInput');
+    input.value='';
+    input.onchange=handlePhotos;
+    input.click();
+  };
+  document.getElementById('addGallery').onclick=()=>{
+    const input=document.getElementById('galleryInput');
     input.value='';
     input.onchange=handlePhotos;
     input.click();
